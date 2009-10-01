@@ -1,0 +1,7 @@
+
+metagenda is an agenda grouping scrapped informations from around choosen websites.
+
+It uses fetchData.py in a cron tab to scrap data from various website and store it in a DB table.
+Then the web.py interface allow users to consult this data and consume it in more standard (RSS/Atom/ical one day?) ways.
+
+The development is now discontinued on this version which was using web.py, the site is still live at http://metagenda.org and now uses django.
