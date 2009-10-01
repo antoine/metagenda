@@ -1,0 +1,45 @@
+$def with (config, last_modif_time, events)
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom'>
+    <id>http://${get_config('server_root_url')}/feed/</id>
+    <updated>$render_rfc3339_time(last_modif_time)</updated>
+    <!--<updated>2007-06-21T10:37:54.000Z</updated>-->
+    <title type='text'>Brussels meta-agenda</title>
+    <subtitle type='text'>All you events are belong to us</subtitle>
+    <link rel='self' type='application/atom+xml' href='http://${get_config('server_root_url')}/feed.atom' title='original feed url'>
+    </link>
+    <link rel='alternate' type='text/html' href='http://${get_config('server_root_url')}' title='html version of the agenda'>
+    </link>
+    <author>
+        <name>antoine</name>
+        <!--<email></email>-->
+    </author>
+    <generator version='0.2r62' uri='http://webpy.org'>webpy</generator>
+    $for e in events:
+        <entry>
+            <id>http://${get_config('server_root_url')}/event/$e.id</id>
+            <published>$render_rfc3339_time(e.time_taken)</published>
+            $if e.updated:
+                <updated>$render_rfc3339_time(e.updated)</updated>
+            $else:
+                <updated>$render_rfc3339_time(e.time_taken)</updated>
+            <title type='html'>$:to_utf8_entity(e.name)</title>
+            <summary type='html'><![CDATA[
+                <div class="vevent" >
+                  <abbr class="dtstart" title="$render_microformat_time(e.time_start)">$render_time(e.time_start)</abbr> &mdash;
+                  <abbr class="dtend" title="$render_microformat_time_end(e.time_start)"></abbr>
+                  <span class="summary" style='display : none;'>$:to_utf8_entity(e.name)</span>
+                  <span class="location">$:to_utf8_entity(e.place)</span> &mdash;
+                  <span class="taken_from">from $e.taken_from</span>
+                  $if e.longitude:
+                      <a href="http://maps.google.com/?q=${e.longitude},${e.latitude}" class="gmapurl">map</a>
+                </div>
+                ]]></summary>
+            <content type='html'>$render_feed_time(e.time_start) - $:to_utf8_entity(e.place)</content>
+            <link rel='alternate' type='text/html' href='http://${get_config('server_root_url')}/event/$e.id' title='alternate'></link>
+            <link rel='via' type='text/html' href='http://www.${e.taken_from}.be' title='source'></link>
+            <author>
+                <name>${e.taken_from}</name>
+            </author>
+        </entry>
+</feed>

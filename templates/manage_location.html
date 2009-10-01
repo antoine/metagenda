@@ -1,0 +1,19 @@
+$def with (longitude, latitude, originalmapurl, location_id, comparison_name)
+<form method="post" action="/admin/locations/$comparison_name">
+    <ul>
+        <li> Gmap URL: <input type="text" id="mapurl" name="gmapurl" size="100" value="$originalmapurl"/> </li>
+    </ul>
+    <script type="text/javascript">
+    document.getElementById('mapurl').focus();
+    </script>
+    OR
+    <ul>
+        <li>Longitude : <input type="text" name="longitude" value="$longitude"/> (gmap format)</li>
+        <li>Latitude : <input type="text" name="latitude" value="$latitude"/> (gmap format)</li>
+    </ul>
+    <p>
+    map url has prevalence
+    </p>
+    <input type="hidden" name="location_id" value="$location_id"/> 
+    <input type="submit" value="update" /></p>
+</form>

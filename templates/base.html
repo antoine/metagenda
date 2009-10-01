@@ -1,0 +1,17 @@
+$def with (page, feeds=[], title="Brussels meta-agenda")
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>$title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <style type="text/css" media="all"> @import "http://boups.com/css/metaagenda.css"; </style>
+    <link rel="alternate"
+    type="application/atom+xml" title="full calendar - Atom"
+    href="http://${get_config('server_root_url')}/feed.atom" />
+    $for feed in feeds:
+        $:feed
+</head>
+<body>
+$:page
+</body>
+</html>

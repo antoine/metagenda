@@ -1,0 +1,73 @@
+$def with (events, admin=False, formap=False)
+$if admin:
+    <div id="admin_links">
+    <a href="http://${get_config('server_root_url')}/admin/locations/nomap">manage locations</a>
+    </div>
+<ul class='empty'> 
+$var day: None
+$for e in events:
+    $var daynow: $render_date(e.time_start)
+    $if self.day != self.daynow:
+        $if self.day != None:
+            </ul>
+            <h3 class="day_date" >$:render_relative_time(e.time_start) 
+            <span class='map'>
+            $if not formap:
+                <a href="http://${get_config('server_root_url')}/event/daymap/${e.time_start.strftime('%Y-%m-%d')}" class="map_icon">
+            $:render_time(e.time_start, header=True)
+            $if formap:
+                </a>
+            </span> </h3>
+            <ul class='events'> 
+        $var day: $render_date(e.time_start)
+    <li class="free${e.is_free}" id="event${e.id}">
+    $if admin:
+        $if e.duplicateof:
+            <div class="vevent duplicate" >
+        $else:
+            <div class="vevent" >
+        <a name="event${e.id}"><span class="eventid">$e.id</span></a> -
+    $else:
+        <div class="vevent" >
+    <div class="tbox">
+    <a href="${get_config('sources')[e.taken_from]['url']}" class="from_url" title="source">
+    <span class="taken_from">
+    <img src="${get_config('sources')[e.taken_from]['favicon']}" class="source_icone" alt="$e.taken_from"/>
+    </span>
+    </a>
+    </div>
+    $if e.url:
+        <a href="$e.url" class="url" title="original link">
+    <span class="summary">$:to_utf8_entity(e.name)</span>
+    $if e.url:
+        </a>
+    <abbr class="dtstart" title="$render_microformat_time(e.time_start)">$:render_time(e.time_start)</abbr>
+    <abbr class="dtend" title="$render_microformat_time_end(e.time_start)"></abbr>
+    $if e.style:
+        <span class="style">($:{to_utf8_entity(e.style)})</span>
+    <span class="location">$:to_utf8_entity(e.place)</span> 
+    $if e.info:
+        <span class="info">$:to_utf8_entity(e.info)</span>
+    $if e.longitude:
+        <span class="maplink">
+        $if formap:
+            <a href="javascript:gotomarker(${e.id}, '$:render_gmap_bubble_text(e)');" class="gmapaction">
+        $else:
+            <a href="$:render_gmap_link(e)" class="gmapurl map_icon">
+        <img src="http://boups.com/img/metaagenda/gmapsmall.gif" alt="map"/></a></span>
+    $if admin:
+        <div class="admin">
+        <span class='edlitloc'><a href="/admin/locations/${compress(e.place)}" class="mapedit">edit location</a></span>
+        $if e.duplicateof:
+            <form method="post" action="/admin/event/$e.id" class="duplicateedit">
+                marked as a duplicateof <a href="#event$e.duplicateof">$e.duplicateof</a> <input type="submit" name="action" value="undo" />
+            </form>
+        $else:
+            <form method="post" action="/admin/event/$e.id" class="duplicateedit">
+                 <input type="submit" value="mark" name="action"/> as a duplicate of <input type="text" name="duplicateof" value=""/>
+            </form>
+        </div>
+    </div>
+    </li>
+
+</ul>

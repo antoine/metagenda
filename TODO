@@ -1,0 +1,15 @@
+add parsers for :
+- vooruit, beurs, kaaitheater 
+- special case when boups party are cancelled
+- extract an url when parsing data
+- extract hour 
+- strategy to check multiple pages (noctis for example)
+
+cancelled events are not showed on HTML/ical but only RSS
+strategy to check already existing event fast : date + levenstheim distance
+ -> RSS feed easy from here
+generate ical from data
+check ATOM format
+URL schema to define
+search/filter options to define for html/RSS
+

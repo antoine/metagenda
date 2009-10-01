@@ -1,0 +1,128 @@
+$def with (events, date, list)
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Party map for $date</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <style type="text/css" media="all"> @import "http://boups.com/css/metaagenda.css"; </style>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=${get_config('googleAPIKey')}"
+    type="text/javascript"></script>
+    <script type="text/javascript">
+        //<![CDATA[
+
+    //value chosen as maxima of the coordinates for google map
+    var maxlon = -400;
+    var minlon = 400;
+    var maxlat = -400;
+    var minlat = 400;
+    var map;
+    var markers = new Object();
+    var highlighted;
+    function load() {
+        if (GBrowserIsCompatible()) {
+            map = new GMap2(document.getElementById("map"));
+            map.addControl(new GSmallMapControl());
+            map.addControl(new GMapTypeControl());
+            map.setCenter(new GLatLng(50.845405,4.348869), 12);
+            map.enableDoubleClickZoom();
+           
+
+            $for event in events:
+                $if event.longitude:
+                    var marker = createMarker(new GLatLng(${event.longitude},${event.latitude}), 'event${event.id}', '$:render_gmap_bubble_text(event)');
+                    //var marker = createMarker(point,"${event.name}","${event.name} <a href='${event.url}'>view event</a>");
+                    map.addOverlay( marker);
+                    setMinMaxCoords(${event.longitude}, ${event.latitude})
+                    markers['event${event.id}'] = marker;
+
+            if (maxlon > -400){
+                //we have at least one coordinate to show
+                var center = new GLatLng( ((maxlon+minlon)/2), (maxlat+minlat)/2 );
+                var bounds = new GLatLngBounds(new GLatLng(minlon, minlat), new GLatLng(maxlon+0.1, maxlat))
+                map.setCenter(center);
+                var minzoom = map.getBoundsZoomLevel(bounds);
+                map.setZoom(minzoom);
+            }
+
+
+        }
+    }
+
+    function createMarker(point, eventid, eventname) {
+        var marker = new GMarker(point);
+        GEvent.addListener(marker, "click", function() {
+            getandhighlightevent(eventid);
+            marker.openInfoWindowHtml(eventname);
+        });
+        return marker;
+    }
+
+	 function classChange(elem,addClass,remClass) { 
+	    if (!elem.className) {
+	    	elem.className = ''; 
+	    }
+	    var clsnm = elem.className; 
+	    if (addClass && !clsnm.match(RegExp("\\b"+addClass+"\\b"))) {
+	    	clsnm = clsnm.replace(/(\S$)/,'$1 ')+addClass;
+	    }
+	    if (remClass) {
+	    	clsnm = clsnm.replace(RegExp("(\\s*\\b"+remClass+"\\b(\\s*))*","g"),'$2'); 
+	    } 
+	    elem.className=clsnm; 
+    }
+
+    function getandhighlightevent(eventid) {
+        doc = document.getElementById(eventid);
+        if (highlighted) {
+            classChange(highlighted, false, 'highlight');
+        }
+        classChange(doc, 'highlight');
+        highlighted = doc;
+    }
+
+    function setMinMaxCoords(lon, lat) {
+        if (maxlon < lon) {
+            maxlon = lon;
+        } 
+        if (minlon > lon) {
+            minlon = lon;
+        }
+        if (maxlat < lat) {
+            maxlat = lat;
+        } 
+        if (minlat > lat) {
+            minlat = lat;
+        }
+    }
+
+    function gotomarker(eventid, name) {
+        marker = markers['event'+eventid]
+        window.setTimeout(function() {
+          map.panTo(marker.getPoint());
+        }, 500);
+        //marker.showMapBlowup();
+        marker.openInfoWindowHtml(name);
+        getandhighlightevent(eventid);
+
+
+
+    }
+
+//]]>
+</script>
+<style type="text/css">
+    .highlight{
+        background-color: red;
+    }
+</style>
+  </head>
+  <body onload="load()" onunload="GUnload()">
+      <div id="map" style="float:right;width: 50%; height: 700px;"></div>
+      <div id="events" style="float:left; width: 45%;">
+      $:list
+      </div>
+  </body>
+</html>
+
